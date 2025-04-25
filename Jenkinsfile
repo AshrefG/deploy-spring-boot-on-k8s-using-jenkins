@@ -2,7 +2,7 @@ pipeline {
 
   tools {
         // Specify the name of the Maven installation defined in Jenkins
-        maven 'Maven'
+        maven 'maven-3.9'
    }
 
   environment {
