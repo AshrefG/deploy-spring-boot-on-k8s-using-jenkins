@@ -36,7 +36,7 @@ Before you begin, ensure you have the following tools and services set up:
 1. Clone this repository to your local machine:
 
    ```bash
-   git clone https://github.com/ZebbaraAbdessamad/deploy-spring-boot-on-k8s-using-jenkins.git
+   git clone https://github.com/AshrefG/deploy-spring-boot-on-k8s-using-jenkins.git
     ```
 
 2. Change to the project directory:
@@ -66,7 +66,7 @@ You can create this image using the following Dockerfile:
       # Install Docker using the official Docker installation script
       RUN curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh
       
-      # Add the Jenkins user to the docker group to run Docker commands without sudo
+      # Add the Jenkins user to the Docker group to run Docker commands without sudo
       RUN usermod -aG docker jenkins
       
       # Install kubectl
@@ -123,7 +123,7 @@ Configure the following credentials in Jenkins:
 ### Test Connection
 
 ---
-Ensure that Jenkins can successfully connect to your Kubernetes cluster and Docker registry, GitHub (webhooks). Test the connections in the Jenkins configuration.
+Ensure that Jenkins can connect to your Kubernetes cluster and Docker registry, GitHub (webhooks). Test the connections in the Jenkins configuration.
 
 
 ### Jenkins Pipeline Stages
@@ -143,7 +143,7 @@ The Jenkins pipeline includes the following stages:
 
 ---
 
-You will use the Kubernetes Service to access the spring boot application container from outside the Kubernetes cluster.
+You will use the Kubernetes Service to access the SpringBoot application container from outside the Kubernetes cluster.
 
 To get the Kubernetes Service, run this command:
 ```bash
@@ -174,4 +174,4 @@ Contributions are welcome! If you have any suggestions or improvements, please c
 
 ---
 
-				                                                      © 2025 Ashref GAMOUDI
+© 2025 Ashref GAMOUDI
