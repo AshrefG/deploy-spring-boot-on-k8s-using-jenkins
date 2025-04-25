@@ -16,7 +16,6 @@
 - [Jenkins Pipeline Stages](#jenkins-pipeline-stages)
 - [Verification](#verification)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Prerequisites
 
@@ -83,9 +82,9 @@ Build this Docker image and use it for your Jenkins server with both Docker and 
 Run your Jenkins server (don't forget to make Jenkins and Minikube cluster in the same network)
 
   ```bash
-   docker run -d -p 8080:8080 -p 50000:50000 
-   -v /var/run/docker.sock:/var/run/docker.sock 
-   -v /home/abdessamad/www/jenkins_home:/var/jenkins_home 
+   docker run -d -p 8080:8080 -p 50000:50000 \
+   -v /var/run/docker.sock:/var/run/docker.sock \
+   -v jenkins_home:/var/jenkins_home \
    --network minikube --name custom-jenkins custom-jenkins-image
 ```
 
