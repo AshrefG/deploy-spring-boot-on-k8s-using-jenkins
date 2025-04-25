@@ -1,64 +1,67 @@
 pipeline {
-
-  tools {
-        // Specify the name of the Maven installation defined in Jenkins
-        maven 'maven-3.9'
-   }
-
-  environment {
-    dockerimagename = "ashrefg/project_pipeline"
-    dockerImage = ""
-  }
-
-  agent any
-
-  stages {
-
-    stage('Build App') {
-        steps {
-            // Build your Spring Boot application
-            sh 'mvn clean package' // Adjust your build command
-        }
-    }
+    agent any
     
-    stage('Build image') {
-      steps{
-        script {
-          dockerImage = docker.build dockerimagename
-        }
-      }
+    tools {
+        maven 'maven-3.9'
+        // Add Docker tool configuration
+        docker 'docker'
     }
 
-    stage('Pushing Image') {
-      environment {
-               registryCredential = 'docker-hub-repo'
-           }
-      steps{
-        script {
-          docker.withRegistry( 'https://registry.hub.docker.com', registryCredential ) {
-            dockerImage.push("latest")
-          }
-        }
-      }
+    environment {
+        dockerimagename = "ashrefg/project_pipeline"
+        // Don't need to declare dockerImage here as we'll use it in script blocks
+        registryUrl = 'https://registry.hub.docker.com'
+        registryCredential = 'docker-hub-repo'
     }
 
-    stage('Deploy to Kubernetes') {
-      steps{
-          withKubeConfig([credentialsId: 'mykubeconfig', serverUrl: 'https://192.168.49.2:8443']) {
-            sh 'kubectl apply -f deployment-k8s.yaml'
+    stages {
+        stage('Build App') {
+            steps {
+                sh 'mvn clean package'
+            }
         }
-      }
+        
+        stage('Build Image') {
+            steps {
+                script {
+                    // Explicitly build from Dockerfile in current directory
+                    dockerImage = docker.build("${dockerimagename}", ".")
+                }
+            }
+        }
+
+        stage('Pushing Image') {
+            steps {
+                script {
+                    docker.withRegistry(env.registryUrl, env.registryCredential) {
+                        dockerImage.push("latest")
+                        // Optionally push with build number tag
+                        dockerImage.push("${env.BUILD_NUMBER}")
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                // Ensure kubectl is available in your Jenkins agent
+                withKubeConfig([credentialsId: 'mykubeconfig', serverUrl: 'https://192.168.49.2:8443']) {
+                    sh 'kubectl apply -f deployment-k8s.yaml'
+                    // Add rollout status check
+                    sh 'kubectl rollout status deployment/<your-deployment-name>'
+                }
+            }
+        }
     }
 
-  }
-
-  post {
-      success {
-          echo 'Deployment successful!'
-      }
-      failure {
-          echo 'Deployment failed.'
-      }
-  }
-
+    post {
+        success {
+            echo 'Deployment successful!'
+            // Optional: Add notification steps
+        }
+        failure {
+            echo 'Deployment failed.'
+            // Optional: Add failure notification steps
+        }
+    }
 }
